@@ -13,7 +13,6 @@ jobs:
         with:
           node-version: '20'
 
-      # 降级回退到极其稳定的 Java 17
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
@@ -26,17 +25,14 @@ jobs:
           cd app
           npm install
           npm install -D typescript
-          
-          # 核心修复：强制锁定安装 Capacitor 5 稳定版，拒绝当小白鼠！
           npm install @capacitor/core@5
           npm install -D @capacitor/cli@5 @capacitor/android@5
           
+          # 【真正修复的地方】：精确指向 tongjian-app 文件夹去调用你的代码！
+          cp -r ../tongjian-app/frontend/src/* src/
+          
           npx cap init "TongjianApp" "com.tongjian.app" --web-dir dist
           npx cap add android
-          
-          if [ -d ../frontend/src ]; then cp -r ../frontend/src/* src/; fi
-          
-          # 绕开所有严格语法检查，强行打包前端
           npx vite build
           npx cap sync android
 
@@ -44,11 +40,10 @@ jobs:
         run: |
           cd app/android
           chmod +x gradlew
-          # 加上 --stacktrace，强迫机器输出最详细的报告
           ./gradlew assembleDebug --stacktrace
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: tongjian-zhiku-app
-          path: app/android/app/build/outputs/apk/debug/app-debug.apk
+          path: '**/*.apk'
