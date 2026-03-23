@@ -21,21 +21,20 @@ jobs:
 
       - name: Build React App and Capacitor
         run: |
-          npm create vite@latest app -- --template react-ts
+          # 核心修复：加入 --yes 强制静默安装，防止由于系统询问而卡死
+          npx --yes create-vite@latest app --template react-ts
           cd app
           npm install
-          
-          # 明确补充安装 typescript 防丢失
-          npm install -D typescript 
+          npm install -D typescript
           npm install @capacitor/core
           npm install -D @capacitor/cli @capacitor/android
           
           npx cap init "TongjianApp" "com.tongjian.app" --web-dir dist
           npx cap add android
           
+          # 覆盖为你写的代码
           if [ -d ../frontend/src ]; then cp -r ../frontend/src/* src/; fi
           
-          # 核心修改：跳过 tsc 严格检查，强制暴力打包
           npx vite build
           npx cap sync android
 
