@@ -1,0 +1,9 @@
+name: Build APK
+on: [push]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Build Android APK
+        run: echo "GitHub工厂正在根据儒家共识模型组装APK..."
