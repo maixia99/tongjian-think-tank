@@ -8,10 +8,11 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
+      # 核心修复 1：强行将 Node.js 引擎升级到最新稳定版 20
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '20'
 
       - name: Setup Java
         uses: actions/setup-java@v4
@@ -21,7 +22,6 @@ jobs:
 
       - name: Build React App and Capacitor
         run: |
-          # 核心修复：加入 --yes 强制静默安装，防止由于系统询问而卡死
           npx --yes create-vite@latest app --template react-ts
           cd app
           npm install
@@ -32,10 +32,11 @@ jobs:
           npx cap init "TongjianApp" "com.tongjian.app" --web-dir dist
           npx cap add android
           
-          # 覆盖为你写的代码
+          # 植入你的前端代码
           if [ -d ../frontend/src ]; then cp -r ../frontend/src/* src/; fi
           
-          npx vite build
+          # 核心修复 2：使用官方标准构建命令，避免模块冲突
+          npm run build
           npx cap sync android
 
       - name: Build APK with Gradle
